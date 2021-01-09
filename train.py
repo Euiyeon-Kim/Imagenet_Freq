@@ -53,7 +53,7 @@ def train(classifier, train_dataloader, val_dataloader):
 
                 if np.mean(val_accs) > best_val_acc:
                     best_val_acc = np.mean(val_accs)
-                    classifier.save_weights(f"{chkpt_dir}/{str(Config.structure)}-classifier-best.h5")
+                    classifier.save_weights(f"{chkpt_dir}/best.h5")
 
             # Save GradCAM
             if (epoch + 1) % Config.epochs_to_save_gradCAM == 0:
@@ -70,10 +70,10 @@ def train(classifier, train_dataloader, val_dataloader):
 
             # Save weights
             if (epoch+1) % Config.epochs_to_save_weights == 0 or (epoch+1) == Config.num_epochs:
-                classifier.save_weights(f"{chkpt_dir}/{str(Config.structure)}-{epoch+1}.h5")
-            if os.path.isfile(f"{chkpt_dir}/{str(Config.structure)}-newest.h5"):
-                os.remove(f"{chkpt_dir}/{str(Config.structure)}-newest.h5")
-            classifier.save_weights(f"{chkpt_dir}/{str(Config.structure)}-newest.h5")
+                classifier.save_weights(f"{chkpt_dir}/{epoch+1}.h5")
+            if os.path.isfile(f"{chkpt_dir}/newest.h5"):
+                os.remove(f"{chkpt_dir}/newest.h5")
+            classifier.save_weights(f"{chkpt_dir}/newest.h5")
 
 
 if __name__ == '__main__':
