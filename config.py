@@ -1,12 +1,12 @@
 class Config:
     # Directories
-    exp_name = 'similar_G_12_lfc'
+    exp_name = 'rm'
     results_dir = f'exps/{exp_name}'
     load_classifier_weight_path = None
 
     # Fourier
     r = 12
-    mode = 'low'
+    mode = 'lfc'
     mask_shape = 'gaussian'
 
     # Trainer
@@ -25,9 +25,10 @@ class Config:
     epochs_to_save_weights = 10
 
     # Data
+    data_mode = 'similar'
     num_classes = 20
     input_shape = (224, 224)
-    root_dir = 'data/imagenet_freq_similar/G_12_lfc'
-    train_txt_path = 'data/imagenet_freq_similar/poc_similar_train_infos.txt'
-    val_txt_path = 'data/imagenet_freq_similar/poc_similar_val_infos.txt'
-    test_txt_path = 'data/imagenet_freq_similar/poc_similar_test_infos.txt'
+    root_dir = 'data/imagenet'
+    train_txt_path = f'data/{data_mode}_train_infos.txt'
+    val_txt_path = f'data/{data_mode}_val_infos.txt'
+    test_txt_path = f'data/{data_mode}_test_infos.txt'

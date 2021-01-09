@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 
-from utils.fourier import fourier_transformation
+from utils.fourier import get_circle_mask, get_gaussian_mask, fourier_transformation
 
 
 def augmentation(img, label):
@@ -24,6 +24,7 @@ class DataLoader:
     def __init__(self, config, ms):
         self._config = config
         self._ms = ms
+        self.mask = None
         self.train_len = 0
         self.val_len = 0
         self.test_len = 0
@@ -48,6 +49,13 @@ class DataLoader:
                 self.test_infos.append(line)
             self.test_len = len(self.test_infos)
 
+        if self._config.mask_shape == 'gaussian':
+            self.mask = get_gaussian_mask(self._config.input_shape[0], self._config.input_shape[1], self._config.r)
+        elif self._config.mask_shape == 'circle':
+            self.mask = get_circle_mask(self._config.input_shape[0], self._config.input_shape[1], self._config.r)
+        else:
+            raise NotImplementedError(f'Fourier transformation {self._config.mask_shape} mask is not implemented')
+
     def _train_data_generator(self, infos):
         while True:
             np.random.shuffle(infos)
@@ -56,9 +64,8 @@ class DataLoader:
                 path = f'{self._config.root_dir}/{path}'
                 if os.path.isfile(path):
                     img = cv2.imread(path)
-                    img = fourier_transformation(img, self._config.r,
-                                                 mask_shape=self._config.mask_shape, mode=self._config.mode)
                     img = cv2.resize(img, self._config.input_shape)
+                    img = fourier_transformation(img, mask=self.mask, mode=self._config.mode)
                     yield img, int(label)
 
     def _test_data_generator(self, infos):

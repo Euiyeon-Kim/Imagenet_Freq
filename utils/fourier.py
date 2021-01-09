@@ -1,19 +1,12 @@
 import cv2
 import numpy as np
 
-DISTINCT = ['n02129604', 'n04086273', 'n04254680', 'n07745940', 'n02690373', 'n03796401', 'n12620546', 'n11879895',
-            'n02676566', 'n01806143', 'n02007558', 'n01695060', 'n03532672', 'n03065424', 'n03837869', 'n07711569',
-            'n07734744', 'n03676483', 'n09229709', 'n07831146']
-SIMILAR = ['n02100735', 'n02110185', 'n02096294', 'n02417914', 'n02110063', 'n02089867', 'n02102177', 'n02092339',
-           'n02098105', 'n02105641', 'n02096051', 'n02110341', 'n02086910', 'n02113712', 'n02113186', 'n02091467',
-           'n02106550', 'n02091831', 'n02104365', 'n02086079']
-
 
 def distance(point1, point2):
     return np.sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2)
 
 
-def get_threshold_mask(h, w, r):
+def get_circle_mask(h, w, r):
     center = (int(h / 2), int(w / 2))
     mask = np.zeros((h, w))
     for i in range(h):
@@ -32,15 +25,8 @@ def get_gaussian_mask(h, w, r):
     return mask
 
 
-def fourier_transformation(img, r, mask_shape='gaussian', mode='both'):
+def fourier_transformation(img, mask, mode='both'):
     h, w, c = img.shape
-
-    if mask_shape == 'gaussian':
-        mask = get_gaussian_mask (h, w, r)
-    elif mask_shape == 'circle':
-        mask = get_threshold_mask(h, w, r)
-    else:
-        raise NotImplementedError(f'Fourier transformation {mask_shape} mask is not implemented')
 
     # spectrum = np.zeros_like(img)
     lfc = np.zeros_like(img)

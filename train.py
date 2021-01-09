@@ -23,7 +23,7 @@ def train(classifier, train_dataloader, val_dataloader):
     os.makedirs(cam_dir, exist_ok=True)
     os.makedirs(log_dir, exist_ok=True)
     os.makedirs(chkpt_dir, exist_ok=True)
-    writer = tf.summary.create_file_writer(log_dir, filename_suffix=f'_{str(Config.structure)}')
+    writer = tf.summary.create_file_writer(log_dir)
     loss_names = ['train/loss', 'train/acc']
 
     best_val_acc = 0
