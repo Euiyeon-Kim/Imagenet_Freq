@@ -12,8 +12,8 @@ from tensorflow.keras.utils import multi_gpu_model
 
 from config import Config
 from utils.utils import get_ms
-from models.modules.gradcam import GuidedGradCAM
-from dataloader.poc_dataloader import DataLoader
+from utils.gradcam import GuidedGradCAM
+from dataloader import DataLoader
 
 
 def train(classifier, train_dataloader, val_dataloader):
