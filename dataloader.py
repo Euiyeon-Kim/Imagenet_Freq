@@ -71,11 +71,11 @@ class DataLoader:
                 img = cv2.resize(img, self._config.input_shape)
                 yield img, int(label)
 
-    def _dataset_from_generator(self, data_generator, augment_fn, repeat=True, drop_remainder=True):
+    def _dataset_from_generator(self, data_generator, repeat=True, drop_remainder=True):
         ds = tf.data.Dataset.from_generator(data_generator,
-                                            output_types=(tf.string, tf.int32),
-                                            output_shapes=((), ()))
-        ds = ds.map(augment_fn, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+                                            output_types=(tf.float32, tf.int32),
+                                            output_shapes=(self._config.input_shape+(3, ), ()))
+        ds = ds.map(augmentation, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         if repeat:
             ds = ds.repeat()
         ds = ds.batch(self.get_batch_size(), drop_remainder=drop_remainder)
@@ -85,25 +85,16 @@ class DataLoader:
         return ds
 
     def get_train_dataloaders(self):
-        load_train_fn = partial(load_train_img_fn,
-                                resize=self._config.imagenet_resize,
-                                num_classes=self._config.num_classes)
         train_data_generator = partial(self._train_data_generator, infos=self.train_infos)
-        train_ds = self._dataset_from_generator(train_data_generator, load_train_fn)
+        train_ds = self._dataset_from_generator(train_data_generator)
 
-        load_val_fn = partial(load_test_img_fn,
-                              resize=self._config.imagenet_resize,
-                              num_classes=self._config.num_classes)
         val_data_generator = partial(self._test_data_generator, infos=self.val_infos)
-        val_ds = self._dataset_from_generator(val_data_generator, load_val_fn, repeat=False, drop_remainder=False)
+        val_ds = self._dataset_from_generator(val_data_generator, repeat=False, drop_remainder=False)
         return train_ds, val_ds
 
     def get_test_dataloaders(self):
-        load_fn = partial(load_test_img_fn,
-                          resize=self._config.imagenet_resize,
-                          num_classes=self._config.num_classes)
         test_data_generator = partial(self._test_data_generator, infos=self.val_infos)
-        test_ds = self._dataset_from_generator(test_data_generator, load_fn, repeat=False, drop_remainder=False)
+        test_ds = self._dataset_from_generator(test_data_generator, repeat=False, drop_remainder=False)
         return test_ds
 
     def get_batch_size(self):
@@ -115,7 +106,11 @@ class DataLoader:
         return batch_size
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    from config import Config
+    print(Config.input_shape)
+    print(Config.input_shape + (3, ))
+    exit()
 #     DISTINCT = ['n02129604', 'n04086273', 'n04254680', 'n07745940', 'n02690373', 'n03796401', 'n12620546', 'n11879895',
 #                 'n02676566', 'n01806143', 'n02007558', 'n01695060', 'n03532672', 'n03065424', 'n03837869', 'n07711569',
 #                 'n07734744', 'n03676483', 'n09229709', 'n07831146']
