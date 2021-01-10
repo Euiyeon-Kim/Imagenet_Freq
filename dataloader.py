@@ -66,7 +66,9 @@ class DataLoader:
                     img = cv2.imread(path)
                     img = cv2.resize(img, self._config.input_shape)
                     img = fourier_transformation(img, mask=self.mask, mode=self._config.mode)
-                    yield img, int(label)
+                    one_hot = np.zeros((self._config.num_classes))
+                    one_hot[int(label)] = 1
+                    yield img, one_hot
 
     def _test_data_generator(self, infos):
         np.random.shuffle(infos)
@@ -76,12 +78,14 @@ class DataLoader:
             if os.path.isfile(path):
                 img = cv2.imread(path)
                 img = cv2.resize(img, self._config.input_shape)
-                yield img, int(label)
+                one_hot = np.zeros((self._config.num_classes))
+                one_hot[int(label)] = 1
+                yield img, one_hot
 
     def _dataset_from_generator(self, data_generator, repeat=True, drop_remainder=True):
         ds = tf.data.Dataset.from_generator(data_generator,
                                             output_types=(tf.float32, tf.int32),
-                                            output_shapes=(self._config.input_shape+(3, ), ()))
+                                            output_shapes=(self._config.input_shape+(3, ), (self._config.num_classes)))
         ds = ds.map(augmentation, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         if repeat:
             ds = ds.repeat()

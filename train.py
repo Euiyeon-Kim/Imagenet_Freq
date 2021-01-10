@@ -7,7 +7,7 @@ import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
 from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.losses import sparse_categorical_crossentropy
+from tensorflow.keras.losses import categorical_crossentropy
 from tensorflow.keras.utils import multi_gpu_model
 
 from config import Config
@@ -60,7 +60,7 @@ def train(classifier, train_dataloader, val_dataloader):
                 cam_model = GuidedGradCAM(classifier, Config.cam_layer)
                 preds = classifier.predict_on_batch(img)
                 predicted_class = preds.argmax(axis=1)[0]
-                real_class = np.argmax(label.numpy(), axis=1)[0]
+                real_class = np.argmax(label, axis=1)[0]
                 sample_img, cam_img = cam_model.generate(np.expand_dims(img[0], axis=0), predicted_class)
 
                 cv2.imwrite(f'{cam_dir}/{epoch}_{predicted_class}_{real_class}_sample.png', sample_img)
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         parallel_model = multi_gpu_model(model, gpus=Config.n_gpus) if Config.n_gpus > 1 else model
         optimizer = RMSprop(learning_rate=Config.lr, momentum=0.9)
         model.compile(optimizer=optimizer,
-                      loss={"predictions": sparse_categorical_crossentropy},
+                      loss={"predictions": categorical_crossentropy},
                       metrics={"predictions": "accuracy"})
         model.summary()
 

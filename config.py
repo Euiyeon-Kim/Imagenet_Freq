@@ -1,6 +1,6 @@
 class Config:
     # Directories
-    exp_name = 'similar_G12_lfc'
+    exp_name = 'rm'
     results_dir = f'exps/{exp_name}'
     load_classifier_weight_path = None
 
